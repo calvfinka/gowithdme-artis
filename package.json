@@ -1,0 +1,13 @@
+{
+  "name": "gowithdme-artis",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sinkron": "python3 tools/gen_events.py && python3 tools/build.py && python3 tools/cek_hasil.py",
+    "build": "python3 tools/build.py",
+    "cek": "python3 tools/cek_hasil.py",
+    "serve": "python3 tools/serve.py 8000",
+    "test": "node --test tests/*.test.mjs"
+  }
+}

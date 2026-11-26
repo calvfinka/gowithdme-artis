@@ -1,0 +1,39 @@
+# Sinkron Direktori Artis: ambil event dari Supabase, bangun ulang halaman artis, commit bila berubah.
+# Jalan sehari sekali (status "H-n" ikut segar), segera setelah event berline-up terbit (supabase/auto_sinkron_artis.sql),
+# saat src/tools/js diubah, atau manual: tab Actions > "Sinkron artis" > Run workflow.
+name: Sinkron artis
+on:
+  schedule: [{cron: "17 21 * * *"}]  # 04.17 WIB; pemicu utama tetap dari Supabase
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["src/**", "tools/**", "js/**", "assets/**", ".github/workflows/sinkron.yml"]
+permissions:
+  contents: write
+  pages: write
+# Satu sinkron berjalan, satu menunggu: banyak pemicu beruntun tidak menumpuk dan perubahan terakhir tetap terambil.
+concurrency: {group: sinkron-artis, cancel-in-progress: false}
+jobs:
+  sinkron:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Ambil data dan bangun
+        run: |
+          python3 tools/gen_events.py
+          export GWM_VER=$(git log -1 --format=%cd --date=format:%Y%m%d%H%M -- src tools js assets)
+          python3 tools/build.py
+          python3 tools/cek_hasil.py
+      - name: Commit jika berubah
+        id: commit
+        run: |
+          git config user.name "gwm-bot"; git config user.email "gwm-bot@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "changed=false" >> $GITHUB_OUTPUT; else git commit -m "Sinkron artis"; git pull --rebase --autostash; git push; echo "changed=true" >> $GITHUB_OUTPUT; fi
+      - name: Minta GitHub Pages membangun ulang
+        if: steps.commit.outputs.changed == 'true'
+        env: {GH_TOKEN: "${{ github.token }}"}
+        run: gh api -X POST "/repos/${{ github.repository }}/pages/builds" || true
