@@ -95,11 +95,53 @@ def _aprice(x):
 def _arange(l,x):
     sd=x["event_date"][:10]; ed=_aend(x)
     return fdate(l,sd)+((" – "+fdate(l,ed)) if ed!=sd else "")
-def _aevent_ld(l,x):
+# ---- data terstruktur Event: description, performer, offers terisi otomatis dari data event ----
+_RP=re.compile(r"(?:Rp\.?\s*)(\d[\d.,]*)\s*(k|rb|ribu)?|(?:mulai(?:\s+dari)?)\s+(\d[\d.,]*)\s*(k|rb|ribu)?",re.I)
+def _parse_prices(label):
+    """'Mulai Rp100.000', 'Rp600.000 – Rp1.250.000', 'Rp1500K', 'Rp. 170,000' -> daftar angka rupiah. 'Gratis' -> [0]. Tidak jelas -> []."""
+    p=(label or "").strip()
+    if not p: return []
+    out=[]
+    for m in _RP.finditer(p):
+        raw=m.group(1) or m.group(3); suf=(m.group(2) or m.group(4) or "").lower()
+        n=int(re.sub(r"\D","",raw) or 0)
+        if suf: n*=1000
+        if n>=1000: out.append(n)
+    if not out and re.match(r"\s*gratis",p,re.I): return [0]
+    return out
+def _aoffers(l,x,ended):
+    pr=_parse_prices(x.get("price_label"))
+    tu=x.get("ticket_url") or ""
+    url=tu if re.match(r"https?://",tu) else f"{MAIN}/{l}/e/{x['slug']}"
+    if not pr and not tu: return None
+    o={"@type":"Offer","url":url,"priceCurrency":"IDR"}
+    if not ended: o["availability"]="https://schema.org/InStock"
+    if pr:
+        lo,hi=min(pr),max(pr)
+        if lo==hi: o["price"]=str(lo)
+        else: o={"@type":"AggregateOffer","url":url,"priceCurrency":"IDR","lowPrice":str(lo),"highPrice":str(hi),**({"availability":o["availability"]} if "availability" in o else {})}
+    return o
+_DESC={"id":("{t} berlangsung di {w}, {r}.","Line-up: {p}.","Harga tiket: {h}."),"en":("{t} takes place at {w}, {r}.","Line-up: {p}.","Ticket price: {h}.")}
+def _adesc(l,x,perf):
+    d=_DESC[l]; w=_awhere(x) or "Indonesia"
+    out=[d[0].format(t=_atitle(l,x),w=w,r=_arange(l,x))]
+    if perf: out.append(d[1].format(p=", ".join(perf[:8])))
+    h=_aprice(x)
+    if h: out.append(d[2].format(h=h))
+    return " ".join(out)
+def _aperformers(x,aname):
+    names=split_lineup(x.get("lineup") or "")[:12]
+    if aname and _akey(aname) not in {_akey(n) for n in names}: names=[aname]+names
+    return names
+def _aevent_ld(l,x,aname=None):
     sd=x["event_date"][:10]; ed=_aend(x)
-    o={"@type":"Event","name":_atitle(l,x),"startDate":sd,"endDate":ed,"url":f"{MAIN}/{l}/e/{x['slug']}",
+    perf=_aperformers(x,aname)
+    o={"@type":"Event","name":_atitle(l,x),"description":_adesc(l,x,perf),"startDate":sd,"endDate":ed,"url":f"{MAIN}/{l}/e/{x['slug']}",
        "eventStatus":"https://schema.org/EventScheduled","eventAttendanceMode":"https://schema.org/OfflineEventAttendanceMode",
        "location":{"@type":"Place","name":x.get("venue") or x.get("city") or "Indonesia","address":{"@type":"PostalAddress","addressLocality":x.get("city") or "","addressCountry":"ID"}}}
+    if perf: o["performer"]=[{"@type":"PerformingGroup","name":n} for n in perf]
+    of=_aoffers(l,x,_ast(x)=="ended")
+    if of: o["offers"]=of
     pu=x.get("poster_url") or ""
     if pu: o["image"]=[pu if re.match(r"https?://",pu) else MAIN+"/"+pu.lstrip("/")]
     return o
@@ -174,7 +216,7 @@ def artist_page(l,a):
     if comp: qa.append((t["a_f_with"].format(a=nm),t["a_f_with_a"].format(x=", ".join(b["name"] for b,_ in comp[:5]))))
     faq=f'<section class="sec"><h2>{t["a_faq_h"]}</h2><div class="faq">'+"".join(f'<details{" open" if i==0 else ""}><summary>{esc(q)}</summary><p>{esc(ans)}</p></details>' for i,(q,ans) in enumerate(qa))+"</div></section>"
     # ---- data terstruktur ----
-    ld={"@context":"https://schema.org","@type":"PerformingGroup","name":nm,"url":u,"inLanguage":l,"event":[_aevent_ld(l,x) for x in (cur+pa)[:12]]}
+    ld={"@context":"https://schema.org","@type":"PerformingGroup","name":nm,"url":u,"inLanguage":l,"event":[_aevent_ld(l,x,nm) for x in (cur+pa)[:12]]}
     bc={"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
         {"@type":"ListItem","position":1,"name":"GoWithDME","item":f"{MAIN}/{l}/"},
         {"@type":"ListItem","position":2,"name":t["a_all"],"item":f"{BASE}/{l}/"},
