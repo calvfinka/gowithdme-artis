@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#0E5A46"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-<script src="../js/theme.js?v=202611270744"></script>
+<script src="../js/theme.js?v=202611280319"></script>
 <style>/* GoWithDME: indeks artis (/a/). Di-inline oleh tools/build.py ke id/a/ dan en/a/ saja.
    Tidak dimuat halaman lain, jadi tidak bisa mengganggu CSS global. Token warna sama dengan css/style.css. */
 :root{
@@ -120,9 +120,18 @@ h1,h2,h3,p,ul{margin:0}
 .ax-empty button{margin-top:12px;height:40px;padding:0 18px;border:1px solid var(--brand);border-radius:10px;background:transparent;
   color:var(--brand);font:inherit;font-size:13px;font-weight:700;cursor:pointer}
 
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}</style><noscript><style>.ax-tools{display:none}</style></noscript></head>
-<body><div class="ax ax-def" id="ax" data-f1="1 artist" data-fn="{n} artists">
-<nav class="ax-crumb"><a href="https://gowithdme.com/en/">GoWithDME</a></nav>
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}/* Bilah atas GoWithDME: logo persis situs utama (kotak hijau, G putih, garis oranye, DME oranye). Di-inline ke halaman artis dan indeks. */
+.gb{position:sticky;top:0;z-index:30;background:var(--card,var(--bg));border-bottom:1px solid var(--line);padding:env(safe-area-inset-top,0px) 16px 0;--gbo:#E4501A}
+:root[data-theme="dark"] .gb{--gbo:#FF6A33}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .gb{--gbo:#FF6A33}}
+.gb-in{max-width:1120px;margin:0 auto;height:52px;display:flex;align-items:center;gap:12px;min-width:0}
+.gb .sp{flex:1}
+.gb .logo{display:flex;align-items:center;gap:9px;flex:none;font-weight:700;font-size:16px;letter-spacing:-.01em;white-space:nowrap;color:var(--ink)}
+.gb .logo svg.mark{width:28px;height:28px;flex:none;display:block}
+.gb .mk-bg{fill:var(--brand)}.gb .mk-g{fill:none;stroke:var(--brand-ink,var(--bink,#fff));stroke-width:4;stroke-linecap:round}.gb .mk-b{fill:none;stroke:#E4501A;stroke-width:4;stroke-linecap:round}
+.gb .logo .w b{color:var(--gbo);font-weight:inherit}
+@media (max-width:420px){.gb .logo .w{display:none}}</style><noscript><style>.ax-tools{display:none}</style></noscript></head>
+<body><header class="gb"><div class="gb-in"><a class="logo" href="https://gowithdme.com/en/" aria-label="GoWithDME"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect class="mk-bg" width="32" height="32" rx="7.5"/><path class="mk-g" d="M23.35 11.75A8.5 8.5 0 1 0 24.5 16"/><path class="mk-b" d="M16.5 16H24.5"/></svg><span class="w">GoWith<b>DME</b></span></a><span class="sp"></span></div></header><div class="ax ax-def" id="ax" data-f1="1 artist" data-fn="{n} artists">
 <h1>Artists & Performers</h1><p class="ax-intro">416 artists and performers from concerts and festivals across Indonesia.</p>
 <div class="ax-tools"><div class="ax-row">
 <label class="ax-search"><span class="ax-sr">Search artists</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="ax-q" type="search" placeholder="Search artist..." autocomplete="off" spellcheck="false" enterkeyhint="search"></label>

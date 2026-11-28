@@ -233,8 +233,9 @@ def artist_page(l,a):
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="../js/theme.js?v={VER}"></script>
-<style>{ART_CSS}</style>{ldj(ld)}{ldj(bc)}{ldj(fld)}</head><body>
-<header class="top"><nav class="crumb" aria-label="Breadcrumb"><a href="{MAIN}/{l}/">GoWithDME</a><span aria-hidden="true">›</span><a href="./">{t["a_all"]}</a><span aria-hidden="true">›</span><span aria-current="page">{esc(nm)}</span></nav><a class="lang" href="../{o}/{esc(a['slug'])}" hreflang="{o}" lang="{o}">{t["a_lang"]}</a></header>
+<style>{ART_CSS}{HDR_CSS}</style>{ldj(ld)}{ldj(bc)}{ldj(fld)}</head><body>
+{site_bar(l,f'<a class="lang" href="../{o}/{esc(a["slug"])}" hreflang="{o}" lang="{o}">{t["a_lang"]}</a>')}
+<div class="top"><nav class="crumb" aria-label="Breadcrumb"><a href="./">{t["a_all"]}</a><span aria-hidden="true">›</span><span aria-current="page">{esc(nm)}</span></nav></div>
 <main id="m" {data}>
 {hero}{stats}{up_h}{noup}{pa_h}{withh}{faq}
 <footer class="foot"><p>{t["note"]}</p><p>{t["a_upd"].format(d=fdate(l,_NOW))} · <a href="./">{t["a_all"]}</a></p></footer>
@@ -244,6 +245,10 @@ def artist_page(l,a):
 TX["id"].update({"a_count1":"{n} event","a_search":"Cari artis...","a_search_l":"Cari artis","a_trend_h":"Artis Trending","a_trend_d":"Nama yang paling sering muncul di line-up.","a_sort":"Urutkan","a_sort_e":"Event Terbanyak","a_sort_a":"A-Z","a_letter":"Filter berdasarkan huruf","a_all_l":"Semua","a_view":"Lihat Event","a_view_l":"Lihat event {a}","a_noup":"Belum ada jadwal mendatang","a_found1":"1 artis","a_foundn":"{n} artis","a_empty":"Tidak ada artis yang cocok.","a_reset":"Hapus filter","a_intro":"{n} artis dan pengisi acara konser dan festival di seluruh Indonesia."})
 TX["en"].update({"a_count1":"{n} event","a_search":"Search artist...","a_search_l":"Search artists","a_trend_h":"Trending Artists","a_trend_d":"The names in the most line-ups.","a_sort":"Sort","a_sort_e":"Most Events","a_sort_a":"A-Z","a_letter":"Filter by letter","a_all_l":"All","a_view":"View Events","a_view_l":"View events for {a}","a_noup":"No upcoming dates yet","a_found1":"1 artist","a_foundn":"{n} artists","a_empty":"No artists match your search.","a_reset":"Clear filters","a_intro":"{n} artists and performers from concerts and festivals across Indonesia."})
 def _read_src(n): return open(f"{ROOT}/src/{n}",encoding="utf-8").read().strip()
+LOGO_MARK='<svg class="mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect class="mk-bg" width="32" height="32" rx="7.5"/><path class="mk-g" d="M23.35 11.75A8.5 8.5 0 1 0 24.5 16"/><path class="mk-b" d="M16.5 16H24.5"/></svg>'
+LOGO_WORD='<span class="w">GoWith<b>DME</b></span>'
+def site_bar(l,right=""): return f'<header class="gb"><div class="gb-in"><a class="logo" href="{MAIN}/{l}/" aria-label="GoWithDME">{LOGO_MARK}{LOGO_WORD}</a><span class="sp"></span>{right}</div></header>'
+
 def _aletter(n):
     m=re.search(r"[A-Z0-9]",_ud.normalize("NFKD",n).encode("ascii","ignore").decode().upper())
     return m.group() if m and m.group().isalpha() else "#"
@@ -278,9 +283,8 @@ def artist_index(l):
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="../js/theme.js?v={VER}"></script>
-<style>{_read_src("artists-index.css")}</style><noscript><style>.ax-tools{{display:none}}</style></noscript></head>
-<body><div class="ax ax-def" id="ax" data-f1="{esc(t["a_found1"])}" data-fn="{esc(t["a_foundn"])}">
-<nav class="ax-crumb"><a href="{MAIN}/{l}/">GoWithDME</a></nav>
+<style>{_read_src("artists-index.css")}{HDR_CSS}</style><noscript><style>.ax-tools{{display:none}}</style></noscript></head>
+<body>{site_bar(l)}<div class="ax ax-def" id="ax" data-f1="{esc(t["a_found1"])}" data-fn="{esc(t["a_foundn"])}">
 <h1>{t["a_index_t"]}</h1><p class="ax-intro">{t["a_intro"].format(n=len(items))}</p>
 <div class="ax-tools"><div class="ax-row">
 <label class="ax-search"><span class="ax-sr">{t["a_search_l"]}</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="ax-q" type="search" placeholder="{esc(t["a_search"])}" autocomplete="off" spellcheck="false" enterkeyhint="search"></label>
@@ -293,7 +297,7 @@ def artist_index(l):
 </div><script>{_read_src("artists-index.js")}</script></body></html>
 """
 assert "index" not in _used,"ada artis bernama 'Index': slugnya bentrok dengan index.html. Ganti nama di data event atau beri pengecualian di kedua repo."
-ART_CSS=_read_src("artist-page.css"); ART_JS=_read_src("artist-page.js")
+HDR_CSS=_read_src("site-header.css"); ART_CSS=_read_src("artist-page.css"); ART_JS=_read_src("artist-page.js")
 
 # ---- tulis halaman ----
 def _w(p,s):

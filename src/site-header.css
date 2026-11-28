@@ -1,0 +1,11 @@
+/* Bilah atas GoWithDME: logo persis situs utama (kotak hijau, G putih, garis oranye, DME oranye). Di-inline ke halaman artis dan indeks. */
+.gb{position:sticky;top:0;z-index:30;background:var(--card,var(--bg));border-bottom:1px solid var(--line);padding:env(safe-area-inset-top,0px) 16px 0;--gbo:#E4501A}
+:root[data-theme="dark"] .gb{--gbo:#FF6A33}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .gb{--gbo:#FF6A33}}
+.gb-in{max-width:1120px;margin:0 auto;height:52px;display:flex;align-items:center;gap:12px;min-width:0}
+.gb .sp{flex:1}
+.gb .logo{display:flex;align-items:center;gap:9px;flex:none;font-weight:700;font-size:16px;letter-spacing:-.01em;white-space:nowrap;color:var(--ink)}
+.gb .logo svg.mark{width:28px;height:28px;flex:none;display:block}
+.gb .mk-bg{fill:var(--brand)}.gb .mk-g{fill:none;stroke:var(--brand-ink,var(--bink,#fff));stroke-width:4;stroke-linecap:round}.gb .mk-b{fill:none;stroke:#E4501A;stroke-width:4;stroke-linecap:round}
+.gb .logo .w b{color:var(--gbo);font-weight:inherit}
+@media (max-width:420px){.gb .logo .w{display:none}}
